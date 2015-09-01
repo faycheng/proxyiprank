@@ -4,14 +4,16 @@ import time
 import random
 import math
 import json
+import threading
 from operator import itemgetter
 from multiprocessing.dummy import Pool as ThreadPool
+
 
 class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 3
+	proxyip_check_times = 10
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.5
 	check_timeout = 10
@@ -100,15 +102,26 @@ class ProxyIPRank(object):
 				if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
 					available_ips.setdefault(proxyip_key, proxyip_value)
 			json.dump(available_ips, fd, indent = 4)
-			
+		
+
 	def start_check_proxyips(self):
 		checked_times = 0
 		while checked_times < self.proxyip_check_times:
-			check_pool = ThreadPool()
-			check_pool.map(self.check_proxyip, self.proxyip_list)
+			# check_pool = ThreadPool()
+			# check_pool.map(self.check_proxyip, self.proxyip_list)
+			# checked_times = checked_times + 1
+			# check_pool.close()
+			# check_pool.join()
+			threads = []
+			for index in range(len(self.proxyip_list)):
+				tmp = self.proxyip_list[index]
+				check_thread = threading.Thread(target = self.check_proxyip, args = (tmp,))
+				threads.append(check_thread)
+			for index in range(len(self.proxyip_list)):
+				threads[index].start()
+			for index in range(len(self.proxyip_list)):
+				threads[index].join()
 			checked_times = checked_times + 1
-			check_pool.close()
-			check_pool.join()
 		self.flush_proxyips_dict()
 		self.rank_proxyips()
 		print self.proxyip_rank_dict
@@ -118,7 +131,7 @@ class ProxyIPRank(object):
 start_time = time.time()
 proxyip_dict = {}
 fd = open('/root/proxy_ips', 'r')
-for line_index in range(50):
+for line_index in range(3000):
 	ip = fd.readline()
 	port = fd.readline()
 	proxyip_dict.setdefault(ip.strip(), port.strip())
