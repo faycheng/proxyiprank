@@ -15,7 +15,7 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 1
+	proxyip_check_times = 8
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.5
 	check_timeout = 10
@@ -79,13 +79,13 @@ class ProxyIPRank(object):
 			print check_time
 			self.proxyip_rank_dict[proxyip]['check_record'].append(check_time)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
-			logging.info(proxyip + '\tsucceeded')
+			#logging.info(proxyip + '\tsucceeded')
 			time.sleep(3)
 		except Exception, e:
 			print e
 			self.proxyip_rank_dict[proxyip]['check_record'].append(0)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
-			logging.info(proxyip + '\tfailed')
+			#logging.info(proxyip + '\tfailed')
 			#logging.exception(e.args)
 			time.sleep(3)
 
@@ -140,6 +140,8 @@ class ProxyIPRank(object):
 			checked_times = checked_times + 1
 		self.flush_proxyips_dict()
 		self.rank_proxyips()
+		#[availability for list_index, availability in enumerate(proxyip_check_info['check_record']) if proxyip_check_info['check_record'][list_index] < self.check_timeout]
+		logging.info('Checked ' + str(len(self.proxyip_rank_dict)) + ' ips. ' + str(len([available_ip for available_ip, proxyip_check_info in self.proxyip_rank_dict.items() if proxyip_check_info['availability_rate'] >= self.proxyip_availability_percent]))+ ' is available.')
 		print self.proxyip_rank_dict
 
 	
@@ -147,7 +149,7 @@ class ProxyIPRank(object):
 start_time = time.time()
 proxyip_dict = {}
 fd = open('/root/proxy_ips', 'r')
-for line_index in range(100):
+for line_index in range(3000):
 	ip = fd.readline()
 	port = fd.readline()
 	proxyip_dict.setdefault(ip.strip(), port.strip())
