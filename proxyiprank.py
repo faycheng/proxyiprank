@@ -4,7 +4,9 @@ import time
 import random
 import math
 import json
+import logging
 import threading
+import traceback
 from operator import itemgetter
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -13,11 +15,12 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 10
+	proxyip_check_times = 1
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.5
 	check_timeout = 10
 	check_target_url = 'http://www.chengxuyuanfei.com/'
+	proxyip_log_path = './proxyiprank.log'
 	user_agents = [
 		('User-agent','Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'),
 		('User-agent','Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2224.3 Safari/537.36'),
@@ -36,23 +39,28 @@ class ProxyIPRank(object):
 		('User-agent','Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0')
 	]
 	def __init__(self, proxyip_list_arg):
+		logging.basicConfig(filename=self.proxyip_log_path, level=logging.INFO, format='%(asctime)s %(levelname)s Func:%(funcName)s Line:%(lineno)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
+		logging.info('Start proxyip rank, init ProxyIPRank object')
 		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
 			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
 			self.proxyip_list.append(proxyip_str)
 		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
 
 
-	def set_check_times(check_times = 3):
+	def set_check_times(self, check_times = 3):
 		self.proxyip_check_times = check_times
 
-	def set_availability_percent(availability_percent = 0.95):
+	def set_availability_percent(self, availability_percent = 0.95):
 		self.proxyip_availability_percent = availability_percent
 
-	def set_target_url(target_url):
+	def set_target_url(self, target_url):
 		self.check_target_url = target_url
 
-	def set_chect_timeout(timeout):
+	def set_chect_timeout(self, timeout):
 		self.check_timeout = timeout
+
+	def set_proxyip_log_path(self, log_path):
+		self.proxyip_log_path = log_path
 
 	def check_proxyip(self, proxyip):
 		check_time = 0
@@ -71,10 +79,16 @@ class ProxyIPRank(object):
 			print check_time
 			self.proxyip_rank_dict[proxyip]['check_record'].append(check_time)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
-		except Exception, detail:
-			print 'Exception Error:', detail
+			logging.info(proxyip + '\tsucceeded')
+			time.sleep(3)
+		except Exception, e:
+			print e
 			self.proxyip_rank_dict[proxyip]['check_record'].append(0)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
+			logging.info(proxyip + '\tfailed')
+			#logging.exception(e.args)
+			time.sleep(3)
+
 
 	def flush_proxyips_dict(self):
 		print self.proxyip_rank_dict
@@ -96,12 +110,14 @@ class ProxyIPRank(object):
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
 		with open(record_save_path, 'a+') as fd:
 			fd.write(json.dumps(self.proxyip_rank_dict, indent = 4))
+			logging.info('Save proxyiprank record to ' + record_save_path)
 		with open(available_ip_sava_path, 'a+') as fd:
 			available_ips = {}
 			for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
 				if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
 					available_ips.setdefault(proxyip_key, proxyip_value)
 			json.dump(available_ips, fd, indent = 4)
+			logging.info('Save available proxyips to ' + available_ip_sava_path)
 		
 
 	def start_check_proxyips(self):
@@ -131,7 +147,7 @@ class ProxyIPRank(object):
 start_time = time.time()
 proxyip_dict = {}
 fd = open('/root/proxy_ips', 'r')
-for line_index in range(3000):
+for line_index in range(100):
 	ip = fd.readline()
 	port = fd.readline()
 	proxyip_dict.setdefault(ip.strip(), port.strip())
