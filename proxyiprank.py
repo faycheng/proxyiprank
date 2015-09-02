@@ -7,6 +7,8 @@ import json
 import logging
 import threading
 import traceback
+import socket
+import os
 from operator import itemgetter
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -15,7 +17,7 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 8
+	proxyip_check_times = 1
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.5
 	check_timeout = 10
@@ -108,16 +110,52 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
-		with open(record_save_path, 'a+') as fd:
-			fd.write(json.dumps(self.proxyip_rank_dict, indent = 4))
-			logging.info('Save proxyiprank record to ' + record_save_path)
-		with open(available_ip_sava_path, 'a+') as fd:
-			available_ips = {}
-			for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
-				if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
-					available_ips.setdefault(proxyip_key, proxyip_value)
-			json.dump(available_ips, fd, indent = 4)
-			logging.info('Save available proxyips to ' + available_ip_sava_path)
+		if os.path.isfile(record_save_path) == False:
+			with open(record_save_path, 'a+') as fd:
+				fd.write(json.dumps(self.proxyip_rank_dict))
+				logging.info('Save proxyiprank record to ' + record_save_path)
+		else:
+			with open(record_save_path, 'a+') as fd:
+				proxyip_rank_dict_file = json.load(fd)
+				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items():
+					proxyip_rank_dict_file[proxyip_key] = proxyip_value
+				with open(record_save_path, 'w') as fd_tmp:
+					fd_tmp.write(json.dumps(proxyip_rank_dict_file))
+				logging.info('Save proxyiprank record to ' + record_save_path)
+		if os.path.isfile(available_ip_sava_path) == False:
+			with open(available_ip_sava_path, 'a+') as fd:
+				available_ips = {}
+				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+						available_ips[proxyip_key] = proxyip_value
+				json.dump(available_ips, fd, indent = 4)
+				logging.info('Save available proxyips to ' + available_ip_sava_path)
+		else:
+			with open(available_ip_sava_path, 'r') as fd:
+				available_ips_file = json.load(fd)
+				available_ips = {}
+				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+						available_ips_file[proxyip_key] = proxyip_value
+				with open(available_ip_sava_path, 'w') as fd_tmp:
+					json.dump(available_ips_file, fd_tmp, indent = 4)
+				logging.info('Save available proxyips to ' + available_ip_sava_path)
+		# with open(record_save_path, 'a+') as fd:
+		# 	proxyip_rank_dict_file = json.load(fd)
+		# 	for proxyip_key, proxyip_value in self.proxyip_rank_dict.items():
+		# 		proxyip_rank_dict_file[proxyip_key] = proxyip_value
+		# 	with open(record_save_path, 'w') as fd_tmp:
+		# 		fd_tmp.write(json.dumps(proxyip_rank_dict_file))
+		# 	logging.info('Save proxyiprank record to ' + record_save_path)
+		# with open(available_ip_sava_path, 'r') as fd:
+		# 	available_ips_file = json.load(fd)
+		# 	available_ips = {}
+		# 	for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+		# 		if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+		# 			available_ips_file[proxyip_key] = proxyip_value
+		# 	with open(available_ip_sava_path, 'w') as fd_tmp:
+		# 		json.dump(available_ips_file, fd_tmp, indent = 4)
+		# 	logging.info('Save available proxyips to ' + available_ip_sava_path)
 		
 
 	def start_check_proxyips(self):
@@ -144,6 +182,28 @@ class ProxyIPRank(object):
 		logging.info('Checked ' + str(len(self.proxyip_rank_dict)) + ' ips. ' + str(len([available_ip for available_ip, proxyip_check_info in self.proxyip_rank_dict.items() if proxyip_check_info['availability_rate'] >= self.proxyip_availability_percent]))+ ' is available.')
 		print self.proxyip_rank_dict
 
+	def start_proxyip_server(self, port_arg = 3000):
+		server_ip = ''
+		server_port = port_arg
+		server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		server_socket.bind((server_ip, server_port))
+		while True:
+			try:
+				client_message, client_address = server_socket.recvfrom(8192)
+				print client_address
+				available_ips = {}
+				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+						available_ips.setdefault(proxyip_key, proxyip_value)
+				available_ips_str = json.dumps(available_ips, indent = 4)
+				server_socket.sendto(available_ips_str, client_address)
+			except Exception, e:
+				print e
+				logging.exception(e)
+			#time.sleep(1)
+
+
 	
 
 start_time = time.time()
@@ -158,6 +218,7 @@ checking_test = ProxyIPRank(proxyip_dict)
 checking_test.start_check_proxyips()
 print "Using time:", time.time() - start_time
 checking_test.save_to_disk()
+checking_test.start_proxyip_server()
 		
 
 

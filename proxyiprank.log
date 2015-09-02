@@ -1,18 +1,8 @@
-2015.09.02  20:48:08 INFO Func:__init__ Line:43 
+2015.09.03  00:12:39 INFO Func:__init__ Line:45 
 		Start proxyip rank, init ProxyIPRank object
-2015.09.02  20:48:29 INFO Func:__init__ Line:43 
-		Start proxyip rank, init ProxyIPRank object
-2015.09.02  20:52:02 INFO Func:start_check_proxyips Line:144 
-		Checked 2886ips.	10is available.
-2015.09.02  20:52:02 INFO Func:save_to_disk Line:113 
+2015.09.03  00:13:00 INFO Func:start_check_proxyips Line:182 
+		Checked 2886 ips. 16 is available.
+2015.09.03  00:13:00 INFO Func:save_to_disk Line:116 
 		Save proxyiprank record to ./proxyiprank.record.json
-2015.09.02  20:52:02 INFO Func:save_to_disk Line:120 
-		Save available proxyips to ./proxyiprank.availability.json
-2015.09.02  20:53:40 INFO Func:__init__ Line:43 
-		Start proxyip rank, init ProxyIPRank object
-2015.09.02  20:56:38 INFO Func:start_check_proxyips Line:144 
-		Checked 2886 ips. 13 is available.
-2015.09.02  20:56:38 INFO Func:save_to_disk Line:113 
-		Save proxyiprank record to ./proxyiprank.record.json
-2015.09.02  20:56:38 INFO Func:save_to_disk Line:120 
+2015.09.03  00:13:00 INFO Func:save_to_disk Line:132 
 		Save available proxyips to ./proxyiprank.availability.json
