@@ -23,6 +23,8 @@ class ProxyIPRank(object):
 	check_timeout = 10
 	check_target_url = 'http://www.chengxuyuanfei.com/'
 	proxyip_log_path = './proxyiprank.log'
+	record_save_path = './proxyiprank.record.json', 
+	available_ip_sava_path = './proxyiprank.availability.json'
 	user_agents = [
 		('User-agent','Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'),
 		('User-agent','Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2224.3 Safari/537.36'),
@@ -40,13 +42,16 @@ class ProxyIPRank(object):
 		('User-agent','Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36'),
 		('User-agent','Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0')
 	]
-	def __init__(self, proxyip_list_arg):
+	def __init__(self, proxyip_list_arg, port_arg = 3000):
 		logging.basicConfig(filename=self.proxyip_log_path, level=logging.INFO, format='%(asctime)s %(levelname)s Func:%(funcName)s Line:%(lineno)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
 		logging.info('Start proxyip rank, init ProxyIPRank object')
 		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
 			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
 			self.proxyip_list.append(proxyip_str)
 		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
+		start_proxyip_server_thread = threading.Thread(target = self.start_proxyip_server, args = (port_arg, ))
+		start_proxyip_server_thread.setDaemon(True)
+		start_proxyip_server_thread.start()
 
 
 	def set_check_times(self, check_times = 3):
@@ -110,6 +115,8 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
+		self.record_save_path = record_save_path
+		self.available_ip_sava_path = available_ip_sava_path
 		if os.path.isfile(record_save_path) == False:
 			with open(record_save_path, 'a+') as fd:
 				fd.write(json.dumps(self.proxyip_rank_dict))
@@ -190,18 +197,38 @@ class ProxyIPRank(object):
 		server_socket.bind((server_ip, server_port))
 		while True:
 			try:
-				client_message, client_address = server_socket.recvfrom(8192)
+				client_message, client_address = server_socket.recvfrom(1024)
 				print client_address
-				available_ips = {}
-				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
-					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
-						available_ips.setdefault(proxyip_key, proxyip_value)
-				available_ips_str = json.dumps(available_ips, indent = 4)
-				server_socket.sendto(available_ips_str, client_address)
+				logging.info('Accept client: ' + client_address[0])
+				send_json_thread = threading.Thread(target = self.send_json_to_client, args = (server_socket, client_address))
+				send_json_thread.start()
+				# with open(self.available_ip_sava_path, 'r') as fd:
+				# 	available_ips = json.load(fd)
+				# # for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+				# # 	if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+				# # 		available_ips.setdefault(proxyip_key, proxyip_value)
+				# available_ips_str = json.dumps(available_ips, indent = 4)
+				# server_socket.sendto(available_ips_str, client_address)
+				# logging.info('Send successful')
 			except Exception, e:
-				print e
+				print 'Exception: ', e
 				logging.exception(e)
 			#time.sleep(1)
+
+	def send_json_to_client(self, server_socket, client_address):
+		try:
+			print 'send_json_to_client', server_socket, client_address
+			with open(self.available_ip_sava_path, 'r') as fd:
+				available_ips = json.load(fd)
+				# for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
+				# 	if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
+				# 		available_ips.setdefault(proxyip_key, proxyip_value)
+				available_ips_str = json.dumps(available_ips, indent = 4)
+				server_socket.sendto(available_ips_str, client_address)
+				logging.info('Send successful')
+		except Exception, e:
+			print 'Exception: ', e
+			logging.exception(e)
 
 
 	

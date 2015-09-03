@@ -1,146 +1,128 @@
 {
-    "222.61.18.60:80": {
+    "117.21.221.3:9000": {
         "disperse_rate": 0.0, 
         "check_record": [
-            4.845412969589233
+            5.917804956436157
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 4.845412969589233, 
-        "lastest_check_time": "2015.09.03-00:12:45"
+        "avg_time": 5.917804956436157, 
+        "lastest_check_time": "2015.09.03-11:56:21"
     }, 
     "119.188.94.145:80": {
         "disperse_rate": 0.0, 
         "check_record": [
-            0.41654300689697266
+            0.5039429664611816
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 0.41654300689697266, 
-        "lastest_check_time": "2015.09.03-00:12:40"
-    }, 
-    "106.5.26.140:9000": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            0.8089241981506348
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 0.8089241981506348, 
-        "lastest_check_time": "2015.09.03-00:12:41"
-    }, 
-    "112.124.76.177:80": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            0.17464709281921387
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 0.17464709281921387, 
-        "lastest_check_time": "2015.09.03-00:12:41"
-    }, 
-    "220.176.129.79:9000": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            0.6191890239715576
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 0.6191890239715576, 
-        "lastest_check_time": "2015.09.03-00:12:40"
-    }, 
-    "203.156.205.185:80": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            0.17459917068481445
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 0.17459917068481445, 
-        "lastest_check_time": "2015.09.03-00:12:40"
-    }, 
-    "123.56.134.65:8080": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            2.1372530460357666
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 2.1372530460357666, 
-        "lastest_check_time": "2015.09.03-00:12:42"
-    }, 
-    "183.141.64.245:3128": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            6.184275150299072
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 6.184275150299072, 
-        "lastest_check_time": "2015.09.03-00:12:46"
-    }, 
-    "210.22.63.67:8080": {
-        "disperse_rate": 0.0, 
-        "check_record": [
-            9.95681095123291
-        ], 
-        "availability_rate": 1.0, 
-        "avg_time": 9.95681095123291, 
-        "lastest_check_time": "2015.09.03-00:12:50"
+        "avg_time": 0.5039429664611816, 
+        "lastest_check_time": "2015.09.03-11:56:16"
     }, 
     "115.159.5.247:80": {
         "disperse_rate": 0.0, 
         "check_record": [
-            0.4460721015930176
+            0.2429640293121338
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 0.4460721015930176, 
-        "lastest_check_time": "2015.09.03-00:12:41"
+        "avg_time": 0.2429640293121338, 
+        "lastest_check_time": "2015.09.03-11:56:16"
+    }, 
+    "123.56.134.65:8080": {
+        "check_record": [
+            0.48349690437316895
+        ], 
+        "avg_time": 0.48349690437316895, 
+        "disperse_rate": 0.0, 
+        "availability_rate": 1.0, 
+        "lastest_check_time": "2015.09.03-11:55:38"
+    }, 
+    "203.156.205.185:80": {
+        "disperse_rate": 0.0, 
+        "check_record": [
+            0.18097209930419922
+        ], 
+        "availability_rate": 1.0, 
+        "avg_time": 0.18097209930419922, 
+        "lastest_check_time": "2015.09.03-11:56:16"
+    }, 
+    "61.157.198.67:8080": {
+        "disperse_rate": 0.0, 
+        "check_record": [
+            2.581859827041626
+        ], 
+        "availability_rate": 1.0, 
+        "avg_time": 2.581859827041626, 
+        "lastest_check_time": "2015.09.03-11:56:18"
+    }, 
+    "219.141.225.149:80": {
+        "check_record": [
+            8.108016014099121
+        ], 
+        "avg_time": 8.108016014099121, 
+        "disperse_rate": 0.0, 
+        "availability_rate": 1.0, 
+        "lastest_check_time": "2015.09.03-11:55:46"
     }, 
     "218.85.134.229:8899": {
         "disperse_rate": 0.0, 
         "check_record": [
-            0.1132960319519043
+            0.3147389888763428
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 0.1132960319519043, 
-        "lastest_check_time": "2015.09.03-00:12:40"
+        "avg_time": 0.3147389888763428, 
+        "lastest_check_time": "2015.09.03-11:56:16"
     }, 
-    "115.227.193.222:3128": {
+    "115.228.55.69:3128": {
         "disperse_rate": 0.0, 
         "check_record": [
-            8.600504875183105
+            1.9944539070129395
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 8.600504875183105, 
-        "lastest_check_time": "2015.09.03-00:12:49"
+        "avg_time": 1.9944539070129395, 
+        "lastest_check_time": "2015.09.03-11:56:18"
     }, 
-    "111.74.56.248:9000": {
+    "183.218.63.174:8118": {
         "disperse_rate": 0.0, 
         "check_record": [
-            1.323293924331665
+            1.4996659755706787
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 1.323293924331665, 
-        "lastest_check_time": "2015.09.03-00:12:41"
+        "avg_time": 1.4996659755706787, 
+        "lastest_check_time": "2015.09.03-11:56:17"
     }, 
     "1.207.245.184:80": {
         "disperse_rate": 0.0, 
         "check_record": [
-            3.11210298538208
+            3.615769863128662
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 3.11210298538208, 
-        "lastest_check_time": "2015.09.03-00:12:43"
+        "avg_time": 3.615769863128662, 
+        "lastest_check_time": "2015.09.03-11:56:19"
     }, 
-    "182.89.127.50:8123": {
+    "27.221.10.194:8081": {
         "disperse_rate": 0.0, 
         "check_record": [
-            2.7774860858917236
+            4.043745040893555
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 2.7774860858917236, 
-        "lastest_check_time": "2015.09.03-00:12:43"
+        "avg_time": 4.043745040893555, 
+        "lastest_check_time": "2015.09.03-11:56:20"
     }, 
-    "118.81.248.105:8090": {
+    "117.21.221.9:9000": {
+        "check_record": [
+            1.0442171096801758
+        ], 
+        "avg_time": 1.0442171096801758, 
+        "disperse_rate": 0.0, 
+        "availability_rate": 1.0, 
+        "lastest_check_time": "2015.09.03-11:55:38"
+    }, 
+    "183.218.63.179:8118": {
         "disperse_rate": 0.0, 
         "check_record": [
-            0.580070972442627
+            2.3394649028778076
         ], 
         "availability_rate": 1.0, 
-        "avg_time": 0.580070972442627, 
-        "lastest_check_time": "2015.09.03-00:12:41"
+        "avg_time": 2.3394649028778076, 
+        "lastest_check_time": "2015.09.03-11:56:18"
     }
 }
