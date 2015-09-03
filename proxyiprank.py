@@ -50,7 +50,7 @@ class ProxyIPRank(object):
 			self.proxyip_list.append(proxyip_str)
 		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
 		start_proxyip_server_thread = threading.Thread(target = self.start_proxyip_server, args = (port_arg, ))
-		start_proxyip_server_thread.setDaemon(True)
+		#start_proxyip_server_thread.setDaemon(True)
 		start_proxyip_server_thread.start()
 
 
@@ -68,6 +68,15 @@ class ProxyIPRank(object):
 
 	def set_proxyip_log_path(self, log_path):
 		self.proxyip_log_path = log_path
+
+	def add_proxyip_list(self, proxyip_list_arg):
+		logging.info('Add proxyips list to check')
+		self.proxyip_list = []
+		self.proxyip_rank_dict = {}
+		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
+			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
+			self.proxyip_list.append(proxyip_str)
+		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
 
 	def check_proxyip(self, proxyip):
 		check_time = 0
@@ -241,11 +250,13 @@ for line_index in range(3000):
 	port = fd.readline()
 	proxyip_dict.setdefault(ip.strip(), port.strip())
 fd.close()
-checking_test = ProxyIPRank(proxyip_dict)
+checking_test = ProxyIPRank(proxyip_dict, 5000)
 checking_test.start_check_proxyips()
 print "Using time:", time.time() - start_time
 checking_test.save_to_disk()
-checking_test.start_proxyip_server()
+checking_test.add_proxyip_list(proxyip_dict)
+checking_test.start_check_proxyips()
+
 		
 
 
