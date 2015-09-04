@@ -17,9 +17,9 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 1
+	proxyip_check_times = 10
 	proxyip_check_times_max = 20
-	proxyip_availability_percent = 0.5
+	proxyip_availability_percent = 0.7
 	check_timeout = 10
 	check_target_url = 'http://www.chengxuyuanfei.com/'
 	proxyip_log_path = './proxyiprank.log'
@@ -124,6 +124,7 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
+		print 'save_to_disk'
 		self.record_save_path = record_save_path
 		self.available_ip_sava_path = available_ip_sava_path
 		if os.path.isfile(record_save_path) == False:
@@ -138,6 +139,7 @@ class ProxyIPRank(object):
 				with open(record_save_path, 'w') as fd_tmp:
 					fd_tmp.write(json.dumps(proxyip_rank_dict_file))
 				logging.info('Save proxyiprank record to ' + record_save_path)
+				print 'logging'
 		if os.path.isfile(available_ip_sava_path) == False:
 			with open(available_ip_sava_path, 'a+') as fd:
 				available_ips = {}
@@ -177,21 +179,21 @@ class ProxyIPRank(object):
 	def start_check_proxyips(self):
 		checked_times = 0
 		while checked_times < self.proxyip_check_times:
-			# check_pool = ThreadPool()
-			# check_pool.map(self.check_proxyip, self.proxyip_list)
-			# checked_times = checked_times + 1
-			# check_pool.close()
-			# check_pool.join()
-			threads = []
-			for index in range(len(self.proxyip_list)):
-				tmp = self.proxyip_list[index]
-				check_thread = threading.Thread(target = self.check_proxyip, args = (tmp,))
-				threads.append(check_thread)
-			for index in range(len(self.proxyip_list)):
-				threads[index].start()
-			for index in range(len(self.proxyip_list)):
-				threads[index].join()
+			check_pool = ThreadPool(len(self.proxyip_list))
+			check_pool.map(self.check_proxyip, self.proxyip_list)
 			checked_times = checked_times + 1
+			check_pool.close()
+			check_pool.join()
+			# threads = []
+			# for index in range(len(self.proxyip_list)):
+			# 	tmp = self.proxyip_list[index]
+			# 	check_thread = threading.Thread(target = self.check_proxyip, args = (tmp,))
+			# 	threads.append(check_thread)
+			# for index in range(len(self.proxyip_list)):
+			# 	threads[index].start()
+			# for index in range(len(self.proxyip_list)):
+			# 	threads[index].join()
+			# checked_times = checked_times + 1
 		self.flush_proxyips_dict()
 		self.rank_proxyips()
 		#[availability for list_index, availability in enumerate(proxyip_check_info['check_record']) if proxyip_check_info['check_record'][list_index] < self.check_timeout]
@@ -210,6 +212,7 @@ class ProxyIPRank(object):
 				print client_address
 				logging.info('Accept client: ' + client_address[0])
 				send_json_thread = threading.Thread(target = self.send_json_to_client, args = (server_socket, client_address))
+				send_json_thread.setDaemon(True)
 				send_json_thread.start()
 				# with open(self.available_ip_sava_path, 'r') as fd:
 				# 	available_ips = json.load(fd)
@@ -242,20 +245,20 @@ class ProxyIPRank(object):
 
 	
 
-start_time = time.time()
-proxyip_dict = {}
-fd = open('/root/proxy_ips', 'r')
-for line_index in range(3000):
-	ip = fd.readline()
-	port = fd.readline()
-	proxyip_dict.setdefault(ip.strip(), port.strip())
-fd.close()
-checking_test = ProxyIPRank(proxyip_dict, 5000)
-checking_test.start_check_proxyips()
-print "Using time:", time.time() - start_time
-checking_test.save_to_disk()
-checking_test.add_proxyip_list(proxyip_dict)
-checking_test.start_check_proxyips()
+# start_time = time.time()
+# proxyip_dict = {}
+# fd = open('/root/proxy_ips', 'r')
+# for line_index in range(3000):
+# 	ip = fd.readline()
+# 	port = fd.readline()
+# 	proxyip_dict.setdefault(ip.strip(), port.strip())
+# fd.close()
+# checking_test = ProxyIPRank(proxyip_dict, 5000)
+# checking_test.start_check_proxyips()
+# print "Using time:", time.time() - start_time
+# checking_test.save_to_disk()
+# checking_test.add_proxyip_list(proxyip_dict)
+# checking_test.start_check_proxyips()
 
 		
 
