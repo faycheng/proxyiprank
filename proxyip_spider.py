@@ -286,10 +286,11 @@ request_six_thread = threading.Thread(target = request_six, args = ())
 request_six_thread.start()
 flush_bak_thread = threading.Thread(target = flush_proxyip_bak, args = ())
 flush_bak_thread.start()
+if first_blood:
+	time.sleep(10)
+	first_blood = False
+checking_test = ProxyIPRank(proxyip_dict, 5000)
 while 1:
-	if first_blood:
-		time.sleep(10)
-		first_blood = False
 	if os.path.isfile('./proxyiprank.availability.json') == True:
 			with open('./proxyiprank.availability.json', 'r') as fd:
 				available_ips_file = json.load(fd)
@@ -312,6 +313,7 @@ while 1:
 		ip = proxyip[:spilt_loc]
 		port = proxyip[spilt_loc + 1:]
 		proxyip_dict[ip] = port
+	checking_test.add_proxyip_list()
 	checking_test = ProxyIPRank(proxyip_dict, 5000)
 	checking_test.start_check_proxyips()
 	checking_test.save_to_disk()

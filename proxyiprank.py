@@ -70,10 +70,10 @@ class ProxyIPRank(object):
 	def set_proxyip_log_path(self, log_path):
 		self.proxyip_log_path = log_path
 
-	def add_proxyip_list(self, proxyip_list_arg):
+	def add_proxyip_list(self, proxyip_dict_arg):
 		self.proxyip_list = []
 		self.proxyip_rank_dict = {}
-		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
+		for proxyip_ip, proxyip_port in proxyip_dict_arg.items():
 			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
 			self.proxyip_list.append(proxyip_str)
 		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
