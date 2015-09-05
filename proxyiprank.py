@@ -8,6 +8,7 @@ import logging
 import threading
 import traceback
 import socket
+import binascii
 import os
 from operator import itemgetter
 from multiprocessing.dummy import Pool as ThreadPool
@@ -124,7 +125,6 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
-		print 'save_to_disk'
 		self.record_save_path = record_save_path
 		self.available_ip_sava_path = available_ip_sava_path
 		if os.path.isfile(record_save_path) == False:
@@ -139,7 +139,6 @@ class ProxyIPRank(object):
 				with open(record_save_path, 'w') as fd_tmp:
 					fd_tmp.write(json.dumps(proxyip_rank_dict_file))
 				logging.info('Save proxyiprank record to ' + record_save_path)
-				print 'logging'
 		if os.path.isfile(available_ip_sava_path) == False:
 			with open(available_ip_sava_path, 'a+') as fd:
 				available_ips = {}
@@ -203,15 +202,16 @@ class ProxyIPRank(object):
 	def start_proxyip_server(self, port_arg = 3000):
 		server_ip = ''
 		server_port = port_arg
-		server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		server_socket.bind((server_ip, server_port))
+		server_socket.listen(5)
 		while True:
 			try:
-				client_message, client_address = server_socket.recvfrom(1024)
-				print client_address
+				client_socket, client_address = server_socket.accept()
+				print 'Tcp accept client: ', client_address
 				logging.info('Accept client: ' + client_address[0])
-				send_json_thread = threading.Thread(target = self.send_json_to_client, args = (server_socket, client_address))
+				send_json_thread = threading.Thread(target = self.send_json_to_client, args = (client_socket,))
 				send_json_thread.setDaemon(True)
 				send_json_thread.start()
 				# with open(self.available_ip_sava_path, 'r') as fd:
@@ -227,20 +227,30 @@ class ProxyIPRank(object):
 				logging.exception(e)
 			#time.sleep(1)
 
-	def send_json_to_client(self, server_socket, client_address):
+	def send_json_to_client(self, client_socket):
 		try:
-			print 'send_json_to_client', server_socket, client_address
+			print '####################################################'
+			print 'send_json_to_client', client_socket
 			with open(self.available_ip_sava_path, 'r') as fd:
 				available_ips = json.load(fd)
 				# for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
 				# 	if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
 				# 		available_ips.setdefault(proxyip_key, proxyip_value)
 				available_ips_str = json.dumps(available_ips, indent = 4)
-				server_socket.sendto(available_ips_str, client_address)
+				available_ips_check_sum = '{:8x}'.format(binascii.crc32(available_ips_str))
+				client_socket.sendall(available_ips_check_sum)
+				socket_buf_size = 1024
+				while available_ips_str:
+					print len(available_ips_str)
+					client_socket.sendall(available_ips_str[:socket_buf_size])
+					available_ips_str = available_ips_str[socket_buf_size:]
+				print 'Send successful'
 				logging.info('Send successful')
 		except Exception, e:
 			print 'Exception: ', e
 			logging.exception(e)
+		finally:
+			client_socket.close()
 
 
 	

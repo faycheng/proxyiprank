@@ -264,6 +264,25 @@ def request_six():
 		except Exception, e:
 			logging.exception(e)
 
+def flush_proxyip_bak():
+	while 1:
+		time.sleep(1800)
+		proxyip_file = set()
+		proxyip_new = set()
+		with open('./proxyips.bak', 'r+') as fd:
+			for line in fd.readlines():
+				proxyip_file.add(line.strip())
+			for proxyip in proxyip_file:
+				if proxyip in proxyip_list:
+					pass
+				else:
+					proxyip_new.add(proxyip)
+			for proxyip in proxyip_set:
+				proxyip_new.add(proxyip)
+			with open('./proxyips.bak', 'w+') as fd_write:
+				for proxyip in proxyip_new:
+					fd_write.write(proxyip + '\n')
+
 request_one_thread = threading.Thread(target = request_one, args = ())
 request_one_thread.start()
 request_two_thread = threading.Thread(target = request_two, args = ())
@@ -274,6 +293,8 @@ request_four_thread = threading.Thread(target = request_four, args = ())
 request_four_thread.start()
 request_six_thread = threading.Thread(target = request_six, args = ())
 request_six_thread.start()
+flush_bak_thread = threading.Thread(target = flush_proxyip_bak, args = ())
+flush_bak_thread.start()
 while 1:
 	if os.path.isfile('./proxyiprank.availability.json') == True:
 			with open('./proxyiprank.availability.json', 'r') as fd:
@@ -284,6 +305,9 @@ while 1:
 		with open('./proxyips.bak', 'r') as fd:
 			for line in fd.readlines():
 				proxyip_set.add(line.strip())
+	else:
+		with open('./proxyips.bak', 'a+') as fd:
+			fd.write('')
 	proxyip_list = []
 	for proxyip in proxyip_set:
 		proxyip_list.append(proxyip)
@@ -299,20 +323,23 @@ while 1:
 	proxyip_file = set()
 	proxyip_new = set()
 	with open('./proxyips.bak', 'r+') as fd:
-			for line in fd.readlines():
-				proxyip_file.add(line.strip())
-			for proxyip in proxyip_file:
-				if proxyip in proxyip_list:
-					pass
-				else:
-					proxyip_new.add(proxyip)
-			with open('./proxyips.bak', 'w+') as fd_write:
-				for proxyip in proxyip_new:
-					fd_write.write(proxyip)
+		for line in fd.readlines():
+			proxyip_file.add(line.strip())
+		for proxyip in proxyip_file:
+			if proxyip in proxyip_list:
+				pass
+			else:
+				proxyip_new.add(proxyip)
+		for proxyip in proxyip_list:
+			proxyip_new.add(proxyip)
+
+		with open('./proxyips.bak', 'w+') as fd_write:
+			for proxyip in proxyip_new:
+				fd_write.write(proxyip + '\n')
 	for proxyip in proxyip_list:
 		if proxyip in proxyip_set:
 			proxyip_set.remove(proxyip)
-	time.sleep(10)
+	time.sleep(1800)
 	
 
 
