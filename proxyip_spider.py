@@ -19,7 +19,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 proxyip_set = set()
-logging.basicConfig(filename='proxyip_spider.log', level=logging.INFO, format='%(asctime)s %(levelname)s Func:%(funcName)s Line:%(lineno)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
+logging.basicConfig(filename='proxyip_spider.log', level=logging.INFO, format='%(asctime)s %(levelname)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
 logging.info('Start crawling proxyips:')
 
 user_agents = [
@@ -65,9 +65,11 @@ def request_url(target_url):
 		content = urllib2.urlopen(req, timeout = 10).read()
 		end_time = time.time()
 		check_time =  end_time - start_time
-		print check_time
+		print 'Cawled %s.\nUsing time:%f'%(target_url ,check_time)
+		logging.info('Cawled %s.\nUsing time:%f'%(target_url ,check_time))
 		return content
 	except Exception, e:
+		logging.info('Cawled %s failed.'%target_url)
 		logging.exception(e)
 
 def request_one():
@@ -75,7 +77,6 @@ def request_one():
 		try:
 			target_url = 'http://www.kuaidaili.com/free/outha/'
 			sleep_time = 43200
-			print 'Cawling ', target_url
 			content_gzip = request_url(target_url)
 			content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -90,7 +91,6 @@ def request_one():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
@@ -100,7 +100,6 @@ def request_two():
 		try:
 			target_url = 'http://www.kuaidaili.com/free/inha/'
 			sleep_time = 43200
-			print 'Cawling ', target_url
 			content_gzip = request_url(target_url)
 			content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -115,7 +114,6 @@ def request_two():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
@@ -124,7 +122,6 @@ def request_three():
 		try:
 			target_url = 'http://cn-proxy.com/'
 			sleep_time = 10800
-			print 'Cawling ', target_url
 			content_gzip = request_url(target_url)
 			content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -146,7 +143,6 @@ def request_three():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
@@ -156,7 +152,6 @@ def request_four():
 		try:
 			target_url = 'http://www.haodailiip.com/'
 			sleep_time = 3600
-			print 'Cawling ', target_url
 			content_gzip = request_url(target_url)
 			content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -176,7 +171,6 @@ def request_four():
 			proxyport_list = content_tree.xpath(xpath_str)
 			for x in range(len(proxyip_list)):
 				proxyip_set.add(str(proxyip_list[x].text).strip() + ':' + str(proxyport_list[x].text).strip()) 
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
@@ -218,7 +212,6 @@ def request_five():
 		try:
 			target_url = 'http://www.66ip.cn/index.html'
 			sleep_time = 43200
-			print 'Cawling ', target_url
 			content_str = request_url(target_url)
 			#content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			#content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -233,7 +226,6 @@ def request_five():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
@@ -244,7 +236,6 @@ def request_six():
 		try:
 			target_url = 'http://ip.izmoney.com/search/china/high/index.html'
 			sleep_time = 1800
-			print 'Cawling ', target_url
 			content_gzip = request_url(target_url)
 			content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
 			content_str = content_str.read().decode('utf-8').encode('utf-8')
@@ -259,7 +250,6 @@ def request_six():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			logging.info('Crawled ' + target_url)
 			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)

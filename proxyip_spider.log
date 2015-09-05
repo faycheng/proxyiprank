@@ -758,3 +758,70 @@ TypeError: must be string or buffer, not None
 		Accept client: 10.15.13.134
 2015.09.05  16:31:28 INFO Func:send_json_to_client Line:248 
 		Send successful
+2015.09.05  20:49:15 INFO Func:<module> Line:23 
+		Start crawling proxyips:
+2015.09.05  20:49:15 INFO Func:__init__ Line:48 
+		Start proxyip rank, init ProxyIPRank object
+2015.09.05  20:49:15 INFO Func:request_url Line:69 
+		Cawled http://www.kuaidaili.com/free/outha/.
+Using time:0.088990
+2015.09.05  20:49:15 INFO Func:request_url Line:69 
+		Cawled http://ip.izmoney.com/search/china/high/index.html.
+Using time:0.354096
+2015.09.05  20:49:15 INFO Func:request_url Line:69 
+		Cawled http://www.kuaidaili.com/free/inha/.
+Using time:0.421209
+2015.09.05  20:49:17 INFO Func:request_url Line:69 
+		Cawled http://www.haodailiip.com/.
+Using time:1.828762
+2015.09.05  21:50:30 INFO 
+		Start crawling proxyips:
+2015.09.05  21:50:30 INFO 
+		Start proxyip rank, init ProxyIPRank object
+2015.09.05  21:50:30 INFO 
+		Cawled http://cn-proxy.com/ failed.
+2015.09.05  21:50:30 ERROR 
+		''
+Traceback (most recent call last):
+  File "proxyip_spider.py", line 65, in request_url
+    content = urllib2.urlopen(req, timeout = 10).read()
+  File "/usr/local/lib/python2.7/urllib2.py", line 154, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/local/lib/python2.7/urllib2.py", line 431, in open
+    response = self._open(req, data)
+  File "/usr/local/lib/python2.7/urllib2.py", line 449, in _open
+    '_open', req)
+  File "/usr/local/lib/python2.7/urllib2.py", line 409, in _call_chain
+    result = func(*args)
+  File "/usr/local/lib/python2.7/urllib2.py", line 1227, in http_open
+    return self.do_open(httplib.HTTPConnection, req)
+  File "/usr/local/lib/python2.7/urllib2.py", line 1200, in do_open
+    r = h.getresponse(buffering=True)
+  File "/usr/local/lib/python2.7/httplib.py", line 1073, in getresponse
+    response.begin()
+  File "/usr/local/lib/python2.7/httplib.py", line 415, in begin
+    version, status, reason = self._read_status()
+  File "/usr/local/lib/python2.7/httplib.py", line 379, in _read_status
+    raise BadStatusLine(line)
+BadStatusLine: ''
+2015.09.05  21:50:30 ERROR 
+		must be string or buffer, not None
+Traceback (most recent call last):
+  File "proxyip_spider.py", line 126, in request_three
+    content_str = gzip.GzipFile(fileobj=StringIO(content_gzip), mode="r")
+TypeError: must be string or buffer, not None
+2015.09.05  21:50:30 INFO 
+		Cawled http://www.kuaidaili.com/free/outha/.
+Using time:0.091048
+2015.09.05  21:50:31 INFO 
+		Cawled http://ip.izmoney.com/search/china/high/index.html.
+Using time:0.281026
+2015.09.05  21:50:31 INFO 
+		Cawled http://www.kuaidaili.com/free/inha/.
+Using time:0.422698
+2015.09.05  21:50:32 INFO 
+		Cawled http://cn-proxy.com/.
+Using time:1.197092
+2015.09.05  21:50:32 INFO 
+		Cawled http://www.haodailiip.com/.
+Using time:1.426765

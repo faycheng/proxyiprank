@@ -44,7 +44,7 @@ class ProxyIPRank(object):
 		('User-agent','Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0')
 	]
 	def __init__(self, proxyip_list_arg, port_arg = 3000):
-		logging.basicConfig(filename=self.proxyip_log_path, level=logging.INFO, format='%(asctime)s %(levelname)s Func:%(funcName)s Line:%(lineno)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
+		logging.basicConfig(filename=self.proxyip_log_path, level=logging.INFO, format='%(asctime)s %(levelname)s \n\t\t%(message)s', datefmt='%Y.%m.%d  %H:%M:%S')
 		logging.info('Start proxyip rank, init ProxyIPRank object')
 		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
 			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
@@ -71,13 +71,14 @@ class ProxyIPRank(object):
 		self.proxyip_log_path = log_path
 
 	def add_proxyip_list(self, proxyip_list_arg):
-		logging.info('Add proxyips list to check')
 		self.proxyip_list = []
 		self.proxyip_rank_dict = {}
 		for proxyip_ip, proxyip_port in proxyip_list_arg.items():
 			proxyip_str = str(proxyip_ip) + ':' + str(proxyip_port)
 			self.proxyip_list.append(proxyip_str)
 		[self.proxyip_rank_dict.setdefault(proxyip, {'avg_time':0.0, 'availability_rate':0.0, 'disperse_rate':0.0, 'check_record':[]}) for proxyip in self.proxyip_list]
+		logging.info('Add proxyips list to check.\n\t Proxyip_list:%s' % str([proxyip for proxyip in self.proxyip_list]))
+
 
 	def check_proxyip(self, proxyip):
 		check_time = 0
@@ -93,13 +94,13 @@ class ProxyIPRank(object):
 			content = urllib2.urlopen(req, timeout = self.check_timeout).read()
 			end_time = time.time()
 			check_time =  end_time - start_time
-			print check_time
+			print 'checking proxy ip:', proxyip, 'using time:', check_time
 			self.proxyip_rank_dict[proxyip]['check_record'].append(check_time)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
 			#logging.info(proxyip + '\tsucceeded')
 			time.sleep(3)
 		except Exception, e:
-			print e
+			print 'checking proxy ip:', proxyip, 'Exception: ', e
 			self.proxyip_rank_dict[proxyip]['check_record'].append(0)
 			self.proxyip_rank_dict[proxyip]['lastest_check_time'] = time.strftime('%Y.%m.%d-%H:%M:%S', time.localtime(time.time()))
 			#logging.info(proxyip + '\tfailed')
@@ -111,10 +112,8 @@ class ProxyIPRank(object):
 		print self.proxyip_rank_dict
 		for proxyip, proxyip_check_info in self.proxyip_rank_dict.items():
 			for list_index, check_time in enumerate(proxyip_check_info['check_record']):
-				print 'check_time:', check_time, 'list_index:', list_index
 				if check_time == 0:
 					self.proxyip_rank_dict[proxyip]['check_record'][list_index] = self.check_timeout
-		print self.proxyip_rank_dict
 
 	def rank_proxyips(self):
 		for proxyip, proxyip_check_info in self.proxyip_rank_dict.items():
@@ -157,23 +156,6 @@ class ProxyIPRank(object):
 				with open(available_ip_sava_path, 'w') as fd_tmp:
 					json.dump(available_ips_file, fd_tmp, indent = 4)
 				logging.info('Save available proxyips to ' + available_ip_sava_path)
-		# with open(record_save_path, 'a+') as fd:
-		# 	proxyip_rank_dict_file = json.load(fd)
-		# 	for proxyip_key, proxyip_value in self.proxyip_rank_dict.items():
-		# 		proxyip_rank_dict_file[proxyip_key] = proxyip_value
-		# 	with open(record_save_path, 'w') as fd_tmp:
-		# 		fd_tmp.write(json.dumps(proxyip_rank_dict_file))
-		# 	logging.info('Save proxyiprank record to ' + record_save_path)
-		# with open(available_ip_sava_path, 'r') as fd:
-		# 	available_ips_file = json.load(fd)
-		# 	available_ips = {}
-		# 	for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
-		# 		if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
-		# 			available_ips_file[proxyip_key] = proxyip_value
-		# 	with open(available_ip_sava_path, 'w') as fd_tmp:
-		# 		json.dump(available_ips_file, fd_tmp, indent = 4)
-		# 	logging.info('Save available proxyips to ' + available_ip_sava_path)
-		
 
 	def start_check_proxyips(self):
 		checked_times = 0
@@ -195,9 +177,8 @@ class ProxyIPRank(object):
 			# checked_times = checked_times + 1
 		self.flush_proxyips_dict()
 		self.rank_proxyips()
-		#[availability for list_index, availability in enumerate(proxyip_check_info['check_record']) if proxyip_check_info['check_record'][list_index] < self.check_timeout]
 		logging.info('Checked ' + str(len(self.proxyip_rank_dict)) + ' ips. ' + str(len([available_ip for available_ip, proxyip_check_info in self.proxyip_rank_dict.items() if proxyip_check_info['availability_rate'] >= self.proxyip_availability_percent]))+ ' is available.')
-		print self.proxyip_rank_dict
+		print 'proxyip_rank: ', self.proxyip_rank_dict
 
 	def start_proxyip_server(self, port_arg = 3000):
 		server_ip = ''
@@ -214,28 +195,15 @@ class ProxyIPRank(object):
 				send_json_thread = threading.Thread(target = self.send_json_to_client, args = (client_socket,))
 				send_json_thread.setDaemon(True)
 				send_json_thread.start()
-				# with open(self.available_ip_sava_path, 'r') as fd:
-				# 	available_ips = json.load(fd)
-				# # for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
-				# # 	if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
-				# # 		available_ips.setdefault(proxyip_key, proxyip_value)
-				# available_ips_str = json.dumps(available_ips, indent = 4)
-				# server_socket.sendto(available_ips_str, client_address)
-				# logging.info('Send successful')
 			except Exception, e:
 				print 'Exception: ', e
 				logging.exception(e)
-			#time.sleep(1)
 
 	def send_json_to_client(self, client_socket):
 		try:
-			print '####################################################'
 			print 'send_json_to_client', client_socket
 			with open(self.available_ip_sava_path, 'r') as fd:
 				available_ips = json.load(fd)
-				# for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
-				# 	if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
-				# 		available_ips.setdefault(proxyip_key, proxyip_value)
 				available_ips_str = json.dumps(available_ips, indent = 4)
 				available_ips_check_sum = '{:8x}'.format(binascii.crc32(available_ips_str))
 				client_socket.sendall(available_ips_check_sum)
