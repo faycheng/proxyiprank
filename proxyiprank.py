@@ -18,7 +18,7 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 10
+	proxyip_check_times = 1
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.7
 	check_timeout = 10
@@ -124,6 +124,8 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
+		print '##############################################################'
+		print [ip for ip, value in self.proxyip_rank_dict.items()],[value['check_record'] for ip, value in self.proxyip_rank_dict.items()]
 		self.record_save_path = record_save_path
 		self.available_ip_sava_path = available_ip_sava_path
 		if os.path.isfile(record_save_path) == False:
@@ -147,12 +149,16 @@ class ProxyIPRank(object):
 				json.dump(available_ips, fd, indent = 4)
 				logging.info('Save available proxyips to ' + available_ip_sava_path)
 		else:
+			print '##############################################################'
+			print [ip for ip, value in self.proxyip_rank_dict.items()],[value['check_record'] for ip, value in self.proxyip_rank_dict.items()]
 			with open(available_ip_sava_path, 'r') as fd:
 				available_ips_file = json.load(fd)
 				available_ips = {}
 				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
 					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
 						available_ips_file[proxyip_key] = proxyip_value
+				print '##############################################################'
+				print [ip for ip, value in available_ips_file.items()],[value['check_record'] for ip, value in available_ips_file.items()]
 				with open(available_ip_sava_path, 'w') as fd_tmp:
 					json.dump(available_ips_file, fd_tmp, indent = 4)
 				logging.info('Save available proxyips to ' + available_ip_sava_path)
@@ -226,7 +232,7 @@ class ProxyIPRank(object):
 # start_time = time.time()
 # proxyip_dict = {}
 # fd = open('/root/proxy_ips', 'r')
-# for line_index in range(3000):
+# for line_index in range(5):
 # 	ip = fd.readline()
 # 	port = fd.readline()
 # 	proxyip_dict.setdefault(ip.strip(), port.strip())
@@ -237,6 +243,24 @@ class ProxyIPRank(object):
 # checking_test.save_to_disk()
 # checking_test.add_proxyip_list(proxyip_dict)
 # checking_test.start_check_proxyips()
+# checking_test.save_to_disk()
+# print "Using time:", time.time() - start_time
+# checking_test.add_proxyip_list(proxyip_dict)
+# checking_test.start_check_proxyips()
+# checking_test.save_to_disk()
+# print "Using time:", time.time() - start_time
+# checking_test.add_proxyip_list(proxyip_dict)
+# checking_test.start_check_proxyips()
+# checking_test.save_to_disk()
+# print "Using time:", time.time() - start_time
+# checking_test.add_proxyip_list(proxyip_dict)
+# checking_test.start_check_proxyips()
+# checking_test.save_to_disk()
+# print "Using time:", time.time() - start_time
+# checking_test.add_proxyip_list(proxyip_dict)
+# checking_test.start_check_proxyips()
+# checking_test.save_to_disk()
+# print "Using time:", time.time() - start_time
 
 		
 

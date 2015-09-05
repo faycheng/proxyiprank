@@ -91,7 +91,7 @@ def request_one():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(sleep_time)
+			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
 
@@ -114,7 +114,7 @@ def request_two():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(sleep_time)
+			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
 def request_three():
@@ -171,7 +171,7 @@ def request_four():
 			proxyport_list = content_tree.xpath(xpath_str)
 			for x in range(len(proxyip_list)):
 				proxyip_set.add(str(proxyip_list[x].text).strip() + ':' + str(proxyport_list[x].text).strip()) 
-			time.sleep(sleep_time)
+			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
 		
@@ -226,7 +226,7 @@ def request_five():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(sleep_time)
+			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
 
@@ -250,7 +250,7 @@ def request_six():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(sleep_time)
+			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
 
@@ -273,6 +273,7 @@ def flush_proxyip_bak():
 				for proxyip in proxyip_new:
 					fd_write.write(proxyip + '\n')
 
+first_blood = True
 request_one_thread = threading.Thread(target = request_one, args = ())
 request_one_thread.start()
 request_two_thread = threading.Thread(target = request_two, args = ())
@@ -286,6 +287,9 @@ request_six_thread.start()
 flush_bak_thread = threading.Thread(target = flush_proxyip_bak, args = ())
 flush_bak_thread.start()
 while 1:
+	if first_blood:
+		time.sleep(10)
+		first_blood = False
 	if os.path.isfile('./proxyiprank.availability.json') == True:
 			with open('./proxyiprank.availability.json', 'r') as fd:
 				available_ips_file = json.load(fd)
@@ -300,6 +304,7 @@ while 1:
 			fd.write('')
 	proxyip_list = []
 	for proxyip in proxyip_set:
+		print proxyip
 		proxyip_list.append(proxyip)
 	proxyip_dict = {}
 	for proxyip in proxyip_list:
@@ -329,7 +334,7 @@ while 1:
 	for proxyip in proxyip_list:
 		if proxyip in proxyip_set:
 			proxyip_set.remove(proxyip)
-	time.sleep(1800)
+	time.sleep(3)
 	
 
 
