@@ -18,7 +18,7 @@ class ProxyIPRank(object):
 	"""docstring for ProxyIPRank"""
 	proxyip_list = []
 	proxyip_rank_dict = {}
-	proxyip_check_times = 1
+	proxyip_check_times = 10
 	proxyip_check_times_max = 20
 	proxyip_availability_percent = 0.7
 	check_timeout = 10
@@ -124,13 +124,12 @@ class ProxyIPRank(object):
 			self.proxyip_rank_dict[proxyip]['disperse_rate'] = math.sqrt(self.proxyip_rank_dict[proxyip]['disperse_rate'] / len(proxyip_check_info['check_record']))
 
 	def save_to_disk(self, record_save_path = './proxyiprank.record.json', available_ip_sava_path = './proxyiprank.availability.json'):
-		print '##############################################################'
 		print [ip for ip, value in self.proxyip_rank_dict.items()],[value['check_record'] for ip, value in self.proxyip_rank_dict.items()]
 		self.record_save_path = record_save_path
 		self.available_ip_sava_path = available_ip_sava_path
 		if os.path.isfile(record_save_path) == False:
 			with open(record_save_path, 'a+') as fd:
-				fd.write(json.dumps(self.proxyip_rank_dict))
+				fd.write(json.dumps(self.proxyip_rank_dict, indent = 4))
 				logging.info('Save proxyiprank record to ' + record_save_path)
 		else:
 			with open(record_save_path, 'a+') as fd:
@@ -149,7 +148,6 @@ class ProxyIPRank(object):
 				json.dump(available_ips, fd, indent = 4)
 				logging.info('Save available proxyips to ' + available_ip_sava_path)
 		else:
-			print '##############################################################'
 			print [ip for ip, value in self.proxyip_rank_dict.items()],[value['check_record'] for ip, value in self.proxyip_rank_dict.items()]
 			with open(available_ip_sava_path, 'r') as fd:
 				available_ips_file = json.load(fd)
@@ -157,7 +155,6 @@ class ProxyIPRank(object):
 				for proxyip_key, proxyip_value in self.proxyip_rank_dict.items() :
 					if proxyip_value['availability_rate'] >= self.proxyip_availability_percent:
 						available_ips_file[proxyip_key] = proxyip_value
-				print '##############################################################'
 				print [ip for ip, value in available_ips_file.items()],[value['check_record'] for ip, value in available_ips_file.items()]
 				with open(available_ip_sava_path, 'w') as fd_tmp:
 					json.dump(available_ips_file, fd_tmp, indent = 4)
@@ -215,7 +212,7 @@ class ProxyIPRank(object):
 				client_socket.sendall(available_ips_check_sum)
 				socket_buf_size = 1024
 				while available_ips_str:
-					print len(available_ips_str)
+					#print len(available_ips_str)
 					client_socket.sendall(available_ips_str[:socket_buf_size])
 					available_ips_str = available_ips_str[socket_buf_size:]
 				print 'Send successful'

@@ -91,9 +91,11 @@ def request_one():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
+
 
 def request_two():
 	while 1:
@@ -114,9 +116,10 @@ def request_two():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
 def request_three():
 	while 1:
 		try:
@@ -143,9 +146,10 @@ def request_three():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(sleep_time)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
 
 def request_four():
 	while 1:
@@ -171,9 +175,10 @@ def request_four():
 			proxyport_list = content_tree.xpath(xpath_str)
 			for x in range(len(proxyip_list)):
 				proxyip_set.add(str(proxyip_list[x].text).strip() + ':' + str(proxyport_list[x].text).strip()) 
-			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
 		
 # def request_five():
 # 	while 1:
@@ -226,9 +231,10 @@ def request_five():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
 
 
 def request_six():
@@ -250,9 +256,10 @@ def request_six():
 				xpath_str = basic_xpath_str.format(arg_tr_index = tr_index, arg_td_index = 2)
 				proxyport = content_tree.xpath(xpath_str)
 				proxyip_set.add(proxyip[0] + ':' + proxyport[0])
-			time.sleep(3)
 		except Exception, e:
 			logging.exception(e)
+		finally:
+			time.sleep(sleep_time)
 
 def flush_proxyip_bak():
 	while 1:
@@ -263,7 +270,7 @@ def flush_proxyip_bak():
 			for line in fd.readlines():
 				proxyip_file.add(line.strip())
 			for proxyip in proxyip_file:
-				if proxyip in proxyip_list:
+				if proxyip in proxyip_set:
 					pass
 				else:
 					proxyip_new.add(proxyip)
@@ -289,7 +296,7 @@ flush_bak_thread.start()
 if first_blood:
 	time.sleep(10)
 	first_blood = False
-checking_test = ProxyIPRank(proxyip_dict, 5000)
+checking_test = ProxyIPRank({}, 5000)
 while 1:
 	if os.path.isfile('./proxyiprank.availability.json') == True:
 			with open('./proxyiprank.availability.json', 'r') as fd:
@@ -313,12 +320,14 @@ while 1:
 		ip = proxyip[:spilt_loc]
 		port = proxyip[spilt_loc + 1:]
 		proxyip_dict[ip] = port
-	checking_test.add_proxyip_list()
-	checking_test = ProxyIPRank(proxyip_dict, 5000)
+	checking_test.add_proxyip_list(proxyip_dict)
 	checking_test.start_check_proxyips()
 	checking_test.save_to_disk()
 	proxyip_file = set()
 	proxyip_new = set()
+	for proxyip in proxyip_list:
+		if proxyip in proxyip_set:
+			proxyip_set.remove(proxyip)
 	with open('./proxyips.bak', 'r+') as fd:
 		for line in fd.readlines():
 			proxyip_file.add(line.strip())
@@ -327,16 +336,12 @@ while 1:
 				pass
 			else:
 				proxyip_new.add(proxyip)
-		for proxyip in proxyip_list:
+		for proxyip in proxyip_set:
 			proxyip_new.add(proxyip)
-
 		with open('./proxyips.bak', 'w+') as fd_write:
 			for proxyip in proxyip_new:
 				fd_write.write(proxyip + '\n')
-	for proxyip in proxyip_list:
-		if proxyip in proxyip_set:
-			proxyip_set.remove(proxyip)
-	time.sleep(3)
+	time.sleep(10)
 	
 
 
