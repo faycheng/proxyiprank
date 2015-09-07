@@ -341,7 +341,7 @@ while 1:
 		with open('./proxyips.bak', 'w+') as fd_write:
 			for proxyip in proxyip_new:
 				fd_write.write(proxyip + '\n')
-	time.sleep(10)
+	time.sleep(1800)
 	
 
 
