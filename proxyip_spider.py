@@ -280,6 +280,23 @@ def flush_proxyip_bak():
 				for proxyip in proxyip_new:
 					fd_write.write(proxyip + '\n')
 
+def flush_proxyip_from_old():
+	while 1:
+		time.sleep(43200)
+		proxyip_file = set()
+		proxyip_new = set()
+		with open('./proxyiprank.availability.json', 'r') as fd:
+				available_ips = json.load(fd)	
+		with open('./proxyips.bak', 'r+') as fd:
+			for line in fd.readlines():
+				proxyip_file.add(line.strip())
+			for proxyip_key, proxyip_value in available_ips.items():
+				proxyip_file.add(proxyip_key)
+			with open('./proxyips.bak', 'w+') as fd_write:
+				for proxyip in proxyip_file:
+					fd_write.write(proxyip + '\n')
+			logging.info('Add old available ips to prxyips.bak')
+
 first_blood = True
 request_one_thread = threading.Thread(target = request_one, args = ())
 request_one_thread.start()
@@ -293,6 +310,8 @@ request_six_thread = threading.Thread(target = request_six, args = ())
 request_six_thread.start()
 flush_bak_thread = threading.Thread(target = flush_proxyip_bak, args = ())
 flush_bak_thread.start()
+flush_old_thread = threading.Thread(target = flush_proxyip_from_old, args = ())
+flush_old_thread.start()
 if first_blood:
 	time.sleep(10)
 	first_blood = False
