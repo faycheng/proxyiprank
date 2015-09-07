@@ -2946,3 +2946,26 @@ Using time:0.422864
 2015.09.07  16:09:02 INFO 
 		Cawled http://www.haodailiip.com/.
 Using time:0.433484
+2015.09.07  16:32:41 INFO 
+		Start crawling proxyips:
+2015.09.07  16:32:41 INFO 
+		Cawled http://www.kuaidaili.com/free/outha/.
+Using time:0.089977
+2015.09.07  16:32:41 INFO 
+		Cawled http://www.kuaidaili.com/free/inha/.
+Using time:0.421802
+2015.09.07  16:32:41 INFO 
+		Cawled http://ip.izmoney.com/search/china/high/index.html.
+Using time:0.503106
+2015.09.07  16:32:42 INFO 
+		Cawled http://cn-proxy.com/.
+Using time:0.829963
+2015.09.07  16:32:42 ERROR 
+		list index out of range
+Traceback (most recent call last):
+  File "proxyip_spider.py", line 141, in request_three
+    proxyip_set.add(proxyip[0] + ':' + proxyport[0])
+IndexError: list index out of range
+2015.09.07  16:32:42 INFO 
+		Cawled http://www.haodailiip.com/.
+Using time:1.166232

@@ -287,6 +287,7 @@ def flush_proxyip_from_old():
 		proxyip_new = set()
 		with open('./proxyiprank.availability.json', 'r') as fd:
 				available_ips = json.load(fd)	
+		os.remove('./proxyiprank.availability.json')
 		with open('./proxyips.bak', 'r+') as fd:
 			for line in fd.readlines():
 				proxyip_file.add(line.strip())
