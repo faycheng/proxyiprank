@@ -53,7 +53,7 @@ target_urls = [
 
 def request_url(target_url):
 	try:
-		proxyip = '115.159.5.247:80'
+		proxyip = '182.254.153.54:8080'
 		proxy_handler = urllib2.ProxyHandler({'http':proxyip})
 		proxy_opener = urllib2.build_opener(proxy_handler)
 		urllib2.install_opener(proxy_opener)
@@ -314,7 +314,7 @@ flush_bak_thread.start()
 flush_old_thread = threading.Thread(target = flush_proxyip_from_old, args = ())
 flush_old_thread.start()
 if first_blood:
-	time.sleep(10)
+	time.sleep(60)
 	first_blood = False
 checking_test = ProxyIPRank({}, 5000)
 while 1:
